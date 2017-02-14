@@ -1,20 +1,20 @@
 (ns cellular-automata.main
-	(:require [cellular-automata.gui :as gui])
-	(:require [cellular-automata.core :as core])
+  (:require [cellular-automata.gui :as gui])
+  (:require [cellular-automata.core :as core])
   (:require [clojure.pprint :as pprint :refer [pprint]])
   (:import javax.swing.SwingUtilities)
-	(:gen-class))
+  (:gen-class))
 
 ; Need to refactor this out of the gui.
 (def neighborhood
   '((-1 -1)
-     (-1  0)
-     (-1  1)
-     ( 0 -1)
-     ( 0  1)
-     ( 1 -1)
-     ( 1  0)
-     ( 1  1)))
+    (-1  0)
+    (-1  1)
+    ( 0 -1)
+    ( 0  1)
+    ( 1 -1)
+    ( 1  0)
+    ( 1  1)))
 
 ; Need to refactor this out of the gui.
 (defn rule

@@ -17,9 +17,9 @@
   "Get the cell at the given location"
   [location automaton]
   (let [cell (first (filter (fn [cell] (= (:location cell) location)) automaton))]
-	  (if (nil? cell)
-		  (create-cell 0 location)
-		  cell)))
+    (if (nil? cell)
+      (create-cell 0 location)
+      cell)))
 
 (defn find-neighbor-locations
   "Find the given cell's neighbor locations"
