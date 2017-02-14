@@ -9,20 +9,23 @@
 ; The cells of the automaton
 (def cells (ref '()))
 
-
+; Cell panel background color
 (def background-color Color/LIGHT_GRAY)
 
-(defn clear-background
+(defn clear
+  "Clear the cell panel"
   [graphics panel]
   (let [width (.getWidth panel)
         height (.getHeight panel)]
     (.setBackground graphics background-color)
     (.clearRect graphics 0 0 width height)))
 
+; Cell width and height
 (def cell-width 10)
 (def cell-height 10)
 
 (defn draw-cells
+  "Draw the cells"
   [graphics panel]
   (let [width (.getWidth panel)
         height (.getHeight panel)]
@@ -39,9 +42,11 @@
             cell-width
             cell-height))))))
 
+; The grid's line color.
 (def line-color Color/DARK_GRAY)
 
 (defn draw-vertical-lines
+  "Draw vertical lines of the cell grid"
   [graphics panel]
   (let [width (.getWidth panel)
         height (.getHeight panel)]
@@ -52,6 +57,7 @@
         (recur (+ x 10))))))
 
 (defn draw-horizontal-lines
+  "Draw horizontal lines of the cell grid"
   [graphics panel]
   (let [width (.getWidth panel)
         height (.getHeight panel)]
@@ -62,6 +68,7 @@
         (recur (+ y 10))))))
 
 (defn create-mouse-adapter
+  "Create the mouse adapter that adds clicked cells"
   [panel]
   (def adapter
     (proxy [MouseAdapter][]
@@ -74,6 +81,7 @@
   adapter)
 
 (defn create-key-adapter
+  "Create the key adapter that will respond to user key presses"
   [frame automaton]
   (proxy [KeyAdapter][]
     (keyPressed [event]
@@ -87,18 +95,20 @@
       (.repaint frame))))
 
 (defn create-cell-panel
+  "Create the JPanel that will draw the cells"
   [x y width height]
   (let [double-buffered true]
     (def cell-panel
       (proxy [JPanel][double-buffered]
         (paintComponent [graphics]
-          (clear-background graphics cell-panel)
+          (clear graphics cell-panel)
           (draw-cells graphics cell-panel)
           (draw-vertical-lines graphics cell-panel)
           (draw-horizontal-lines graphics cell-panel))))
     cell-panel))
 
 (defn create-gui
+  "Create the GUI"
   [automaton]
   (let [frame-width 640
         frame-height 480
@@ -112,4 +122,3 @@
     (.add frame cell-panel)
     (.setVisible frame true)
     (.pack frame)))
-
