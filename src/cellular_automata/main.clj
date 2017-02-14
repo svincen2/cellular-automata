@@ -5,7 +5,7 @@
   (:import javax.swing.SwingUtilities)
   (:gen-class))
 
-; Need to refactor this out of the gui.
+; A cell's neighborhood defined by offsets to its location"
 (def neighborhood
   '((-1 -1)
     (-1  0)
@@ -16,7 +16,6 @@
     ( 1  0)
     ( 1  1)))
 
-; Need to refactor this out of the gui.
 (defn rule
   "Rule that governs the cells.
    This implementation is the rule for Game of Life"
@@ -35,7 +34,6 @@
 (def updater (core/make-automaton-updater neighborhood rule))
 
 
-; A cell's neighborhood defined by offsets to its location"
 (defn -main
   "Cellular automata"
   [& args]
