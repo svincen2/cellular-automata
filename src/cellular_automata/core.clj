@@ -13,54 +13,23 @@
   [cell]
   (= 1 (:state cell)))
 
-(defn dead?
-  "Is the given cell 'dead' (state == 0)"
-  [cell]
-  (= 0 (:state cell)))
-
-; A cell's neighborhood defined by offsets to its location"
-(def neighborhood
-  '((-1 -1)
-    (-1  0)
-    (-1  1)
-    ( 0 -1)
-    ( 0  1)
-    ( 1 -1)
-    ( 1  0)
-    ( 1  1)))
-
-(defn rule
-  "Rule that governs the cells.
-   This implementation is the rule for Game of Life"
-  [cell neighbors]
-  (let [living (count (filter alive? neighbors))
-				loc (:location cell)]
-    (if (alive? cell)
-      (if (or (< living 2) (> living 3))
-				(create-cell 0 loc)
-				cell)
-    	(if (= 3 living)
-				(create-cell 1 loc)
-				cell))))
-
 (defn get-cell-at
   "Get the cell at the given location"
   [location automaton]
-	(def cell
-  	(first (filter (fn [cell] (= (:location cell) location)) automaton)))
-	(if (nil? cell)
-		(create-cell 0 location)
-		cell))
+  (let [cell (first (filter (fn [cell] (= (:location cell) location)) automaton))]
+	  (if (nil? cell)
+		  (create-cell 0 location)
+		  cell)))
 
 (defn find-neighbor-locations
   "Find the given cell's neighbor locations"
-  [cell]
-  (map (fn [loc] (utils/piecewise-add loc (:location cell))) neighborhood))
+  [cell neighborhood]
+  (map (fn [loc] (map + loc (:location cell))) neighborhood))
 
 (defn find-neighbors
   "Find the given cell's neighbor cells"
-  [cell cells]
-  (let [neighbor-locs (find-neighbor-locations cell)]
+  [cell cells neighborhood]
+  (let [neighbor-locs (find-neighbor-locations cell neighborhood)]
     (map (fn [loc] (get-cell-at loc cells)) neighbor-locs)))
 
 
@@ -77,12 +46,12 @@
 (defn add-new-neighbors
   "Add any new cells that neighbor existing cells
    to the automaton"
-  [cells]
-    (def distinct-locs
-      (set
-        (reduce
-          concat
-	  (map (fn [cell] (find-neighbor-locations cell)) cells))))
+  [cells neighborhood]
+  (def distinct-locs
+    (set
+      (reduce
+        concat
+        (map (fn [cell] (find-neighbor-locations cell neighborhood)) cells))))
     (def new-cells
       (map
         (fn [loc] (create-cell 0 loc))
@@ -93,10 +62,13 @@
 
 (defn update-automaton
   "Update the given automaton by applying the rule to each cell"
-  [automaton]
-  (let [new-automaton (add-new-neighbors automaton)]
+  [cells neighborhood rule]
+  (let [new-automaton (add-new-neighbors cells neighborhood)]
     (filter alive?
       (map
-        (fn [cell] (rule cell (find-neighbors cell automaton)))
+        (fn [cell] (rule cell (find-neighbors cell cells neighborhood)))
         new-automaton))))
 
+(defn make-automaton-updater
+  [neighborhood rule]
+  (fn [cells] (update-automaton cells neighborhood rule)))
