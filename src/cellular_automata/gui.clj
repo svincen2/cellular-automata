@@ -74,19 +74,17 @@
   adapter)
 
 (defn create-key-adapter
-  [frame automaton-updater]
-  (def adapter
-    (proxy [KeyAdapter][]
-      (keyPressed [event]
-        (cond
-          (= KeyEvent/VK_SPACE (.getKeyCode event))
-            (dosync
-              (alter cells automaton-updater))
-          (= KeyEvent/VK_C (.getKeyCode event))
-            (dosync
-              (alter cells (fn [v] '()))))
-        (.repaint frame))))
-  adapter)
+  [frame automaton]
+  (proxy [KeyAdapter][]
+    (keyPressed [event]
+      (cond
+        (= KeyEvent/VK_SPACE (.getKeyCode event))
+          (dosync
+            (alter cells automaton))
+        (= KeyEvent/VK_C (.getKeyCode event))
+          (dosync
+            (alter cells (fn [v] '()))))
+      (.repaint frame))))
 
 (defn create-cell-panel
   [x y width height]
@@ -101,7 +99,7 @@
     cell-panel))
 
 (defn create-gui
-  [automaton-updater]
+  [automaton]
   (let [frame-width 640
         frame-height 480
         title "Cellular Automata!"]
@@ -109,7 +107,7 @@
     (def panel (create-cell-panel 0 0 frame-width frame-height))
     (.setDefaultCloseOperation frame WindowConstants/EXIT_ON_CLOSE)
     (.setPreferredSize frame (new Dimension frame-width frame-height))
-    (.addKeyListener frame (create-key-adapter frame automaton-updater))
+    (.addKeyListener frame (create-key-adapter frame automaton))
     (.addMouseListener cell-panel (create-mouse-adapter panel))
     (.add frame cell-panel)
     (.setVisible frame true)

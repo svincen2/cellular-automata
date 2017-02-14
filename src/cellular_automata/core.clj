@@ -26,12 +26,11 @@
   [cell neighborhood]
   (map (fn [loc] (map + loc (:location cell))) neighborhood))
 
-(defn find-neighbors
+(defn find-neighbor-cells
   "Find the given cell's neighbor cells"
   [cell cells neighborhood]
   (let [neighbor-locs (find-neighbor-locations cell neighborhood)]
     (map (fn [loc] (get-cell-at loc cells)) neighbor-locs)))
-
 
 (defn cell-exists?
   "Does a cell at the given location exist?"
@@ -43,22 +42,34 @@
 	true
 	(cell-exists? (rest cells) loc)))))
 
+(defn distinct-locations
+  "Get the entire cell community.
+   The community is defined as all current cells'
+   neighbors"
+  [cells neighborhood]
+  (set
+    (reduce
+      concat
+      (map
+        (fn [cell] (find-neighbor-locations cell neighborhood))
+        cells))))
+
+(defn filter-new-cells
+  "Filter out any cells that currently exist"
+  [cells locations]
+  (map
+    (fn [loc] (create-cell 0 loc))
+    (filter
+      (fn [loc] (not (cell-exists? cells loc)))
+      locations)))
+
 (defn add-new-neighbors
   "Add any new cells that neighbor existing cells
    to the automaton"
   [cells neighborhood]
-  (def distinct-locs
-    (set
-      (reduce
-        concat
-        (map (fn [cell] (find-neighbor-locations cell neighborhood)) cells))))
-    (def new-cells
-      (map
-        (fn [loc] (create-cell 0 loc))
-        (filter
-          (fn [loc] (not (cell-exists? cells loc)))
-          distinct-locs)))
-    (concat cells new-cells))
+  (let [distinct-locs (distinct-locations cells neighborhood)
+        new-cells (filter-new-cells cells distinct-locs)]
+    (concat cells new-cells)))
 
 (defn update-automaton
   "Update the given automaton by applying the rule to each cell"
@@ -66,9 +77,10 @@
   (let [new-automaton (add-new-neighbors cells neighborhood)]
     (filter alive?
       (map
-        (fn [cell] (rule cell (find-neighbors cell cells neighborhood)))
+        (fn [cell] (rule cell (find-neighbor-cells cell cells neighborhood)))
         new-automaton))))
 
-(defn make-automaton-updater
+(defn make-automaton
+  "Make an automaton with the given neighborhood definition and rule"
   [neighborhood rule]
   (fn [cells] (update-automaton cells neighborhood rule)))

@@ -30,11 +30,11 @@
         (core/create-cell 1 loc)
         cell))))
 
-; Automaton updater
-(def updater (core/make-automaton-updater neighborhood rule))
+; Automaton - Currently the Game of Life
+(def automaton (core/make-automaton neighborhood rule))
 
 
 (defn -main
   "Cellular automata"
   [& args]
-  (SwingUtilities/invokeLater (fn [] (gui/create-gui updater))))
+  (SwingUtilities/invokeLater (fn [] (gui/create-gui automaton))))
