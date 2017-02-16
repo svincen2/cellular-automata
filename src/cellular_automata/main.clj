@@ -2,7 +2,7 @@
   (:require [cellular-automata.gui :as gui])
   (:require [cellular-automata.core :as core])
   (:require [clojure.pprint :as pprint :refer [pprint]])
-  (:import javax.swing.SwingUtilities)
+  (:import [javax.swing SwingUtilities Timer])
   (:gen-class))
 
 ; A cell's neighborhood defined by offsets to its location"
