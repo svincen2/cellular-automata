@@ -7,14 +7,14 @@
 
 ;; State.
 
-(def cells (ref '()))
+(def cells (ref {}))
 (def cell-width 10)
 (def cell-height 10)
 (def background-color Color/LIGHT_GRAY)
 (def line-color Color/DARK_GRAY)
 (def width 640)
 (def height 480)
-(def update-interval 10)
+(def update-interval 100)
 
 
 (defn clear
@@ -34,15 +34,15 @@
     (.setColor graphics Color/BLACK)
     (dosync
       (doseq [c @cells]
-        (let [loc (:location c)]
+        (let [loc (key c)]
           (if (core/alive? c)
             (.setColor graphics Color/BLACK)
             (.setColor graphics background-color))
-            (.fillRect graphics
-            (* cell-width (get loc 0))
-            (* cell-height (get loc 1))
-            cell-width
-            cell-height))))))
+          (.fillRect graphics
+                     (* cell-width (get loc 0))
+                     (* cell-height (get loc 1))
+                     cell-width
+                     cell-height))))))
 
 
 
@@ -104,8 +104,8 @@
     (let [x (int (/ (.getX event) cell-width))
           y (int (/ (.getY event) cell-height))]
       (dosync
-        (alter cells conj (core/create-cell 1 x y))))
-    (.repaint panel))))
+        (alter cells conj (core/create-cell 1 [x y])))
+    (.repaint panel)))))
 
 (defn create-key-adapter
   "Create the key adapter that will respond to user key presses"
@@ -117,7 +117,7 @@
           (if (.isRunning timer) (.stop timer) (.start timer))
         (= KeyEvent/VK_C (.getKeyCode event))
           (dosync
-            (alter cells (fn [v] '()))))
+            (alter cells (fn [v] {}))))
       (.repaint frame))))
 
 (defn create-gui
