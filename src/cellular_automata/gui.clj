@@ -104,7 +104,9 @@
     (let [x (int (/ (.getX event) cell-width))
           y (int (/ (.getY event) cell-height))]
       (dosync
-        (alter cells conj (core/create-cell 1 x y))))
+        (if (core/cell-exists? @cells [x y])
+          (alter cells core/remove-cell [x y])
+          (alter cells conj (core/create-cell 1 x y)))))
     (.repaint panel))))
 
 (defn create-key-adapter

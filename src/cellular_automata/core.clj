@@ -1,5 +1,4 @@
 (ns cellular-automata.core
-  (:require [cellular-automata.utils :as utils])
   (:gen-class))
 
 
@@ -21,6 +20,10 @@
       (create-cell 0 location)
       cell)))
 
+(defn remove-cell
+  [cells loc]
+  (filter #(not (= loc (:location %))) cells))
+
 (defn find-neighbor-locations
   "Find the given cell's neighbor locations"
   [cell neighborhood]
@@ -39,8 +42,8 @@
     (if (nil? next)
       false
       (if (= (:location next) loc)
-	true
-	(cell-exists? (rest cells) loc)))))
+	      true
+	      (cell-exists? (rest cells) loc)))))
 
 (defn distinct-locations
   "Get the entire cell community.
